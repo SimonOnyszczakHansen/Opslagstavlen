@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_2/burger_menu.dart';
 import 'package:provider/provider.dart';
 import 'providers/camera_provider.dart';
+import 'providers/image_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'camera.dart';
 import 'gallery.dart';
@@ -31,8 +32,11 @@ class MyApp extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => CameraProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CameraProvider()),
+        ChangeNotifierProvider(create: (_) => ImageStorageProvider())
+      ],
       child: MaterialApp.router(
         title: 'Home Page',
         theme: ThemeData(
