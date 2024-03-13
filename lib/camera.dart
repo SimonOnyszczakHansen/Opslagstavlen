@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_2/burger_menu.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
-import 'providers/image_provider.dart'; // Ensure this import is correct
-import 'providers/camera_provider.dart'; // Ensure this import is correct
+import 'providers/image_provider.dart';
+import 'providers/camera_provider.dart'; 
+import 'package:http/http.dart' as http;
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
 
   @override
-  _CameraPageState createState() => _CameraPageState();
+  CameraPageState createState() => CameraPageState();
 }
 
-class _CameraPageState extends State<CameraPage> {
+class CameraPageState extends State<CameraPage> {
   late CameraController _controller;
 
   @override
@@ -41,16 +42,31 @@ class _CameraPageState extends State<CameraPage> {
     super.dispose();
   }
 
-  Future<void> _takePicture() async {
-    try {
-      final image = await _controller.takePicture();
-      // Save the image using ImageStorageProvider
-      Provider.of<ImageStorageProvider>(context, listen: false)
-          .saveImagePath(image.path);
-    } catch (e) {
-      print(e);
-    }
+Future<void> _takePicture() async {
+  try {
+    final image = await _controller.takePicture();
+    // Upload the image after capturing
+    await _uploadImage(image);
+    // Optionally save the image path locally if the upload succeeds
+    Provider.of<ImageStorageProvider>(context, listen: false).saveImagePath(image.path);
+  } catch (e) {
+    print(e.toString());
   }
+}
+
+  Future<void> _uploadImage(XFile image) async {
+  var uri = Uri.parse('http://10.0.2.2:3000/api/upload');
+  var request = http.MultipartRequest('POST', uri)
+    ..files.add(await http.MultipartFile.fromPath('image', image.path));
+
+  var response = await request.send();
+
+  if (response.statusCode == 200) {
+    print('Image uploaded successfully');
+  } else {
+    print('Failed to upload image');
+  }
+}
 
   @override
   Widget build(BuildContext context) {

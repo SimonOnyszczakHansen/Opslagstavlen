@@ -1,137 +1,97 @@
-import 'dart:io';
+// Import statements
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/burger_menu.dart';
-import 'package:provider/provider.dart';
+import 'dart:io';
 import 'providers/image_provider.dart';
+import 'package:provider/provider.dart';
+import 'models/positioned_image_model.dart'; // Make sure to import the PositionedImage model here
 
 class GalleryPage extends StatefulWidget {
   const GalleryPage({Key? key}) : super(key: key);
 
   @override
-  _GalleryPageState createState() => _GalleryPageState();
+  GalleryPageState createState() => GalleryPageState();
 }
 
-class _GalleryPageState extends State<GalleryPage> {
-  List<String> droppedImagePaths = []; // Store paths of dropped images
+class GalleryPageState extends State<GalleryPage> {
+  List<PositionedImage> bulletinBoardImages = [];
+  Set<String> bulletinBoardImagePaths = Set();
+
+  Future<List<String>> fetchImagePaths() async {
+    List<String>? paths = await Provider.of<ImageStorageProvider>(context, listen: false).getSavedImagePaths();
+    return paths?.where((path) => !bulletinBoardImagePaths.contains(path)).toList() ?? [];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Gallery')),
       drawer: const BurgerMenu(),
-      body: Stack(
+      body: Column(
         children: [
-          // Positioned.fill replaced with a more specific container for the bulletin board
-          Container(
-            margin: const EdgeInsets.all(8.0),
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: Colors.white, // Background color of the bulletin board
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: DragTarget<String>(
-              onAccept: (receivedImagePath) {
-                setState(() {
-                  droppedImagePaths.add(receivedImagePath);
-                });
-              },
-              builder: (
-                BuildContext context,
-                List<dynamic> candidateData,
-                List<dynamic> rejectedData,
-              ) {
-                return GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 4.0,
-                    mainAxisSpacing: 4.0,
-                    childAspectRatio: 1.0,
+          Expanded(
+            child: Stack(
+              children: bulletinBoardImages.map((positionedImage) {
+                return Positioned(
+                  left: positionedImage.position.dx,
+                  top: positionedImage.position.dy,
+                  child: Draggable<String>(
+                    data: positionedImage.imagePath,
+                    feedback: Material(
+                      elevation: 4.0,
+                      child: Image.file(File(positionedImage.imagePath), width: 100, height: 100),
+                    ),
+                    childWhenDragging: Container(),
+                    onDragEnd: (details) {
+                      setState(() {
+                        positionedImage.position = details.offset;
+                      });
+                    },
+                    child: Image.file(File(positionedImage.imagePath), width: 100, height: 100),
                   ),
-                  itemCount: droppedImagePaths.length,
-                  itemBuilder: (context, index) {
-                    final imagePath = droppedImagePaths[index];
-                    return Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            File(imagePath),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
                 );
-              },
+              }).toList(),
             ),
           ),
-          // FutureBuilder for draggable images in the footer remains unchanged
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: FutureBuilder<List<String>?>(
-              future: Provider.of<ImageStorageProvider>(context, listen: false)
-                  .getSavedImagePaths(),
+          Container(
+            height: 100,
+            child: FutureBuilder<List<String>>(
+              future: fetchImagePaths(),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  final List<String>? imagePaths = snapshot.data;
-                  if (imagePaths == null || imagePaths.isEmpty) {
-                    return const SizedBox(
-                      height: 100,
-                      child: Center(child: Text('No images found')),
-                    );
-                  }
-                  return SizedBox(
-                    height: 100, // Footer height
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: imagePaths.length,
-                      itemBuilder: (context, index) {
-                        final imagePath = imagePaths[index];
-                        return Draggable<String>(
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else {
+                  // Draggable Image Footer
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      String imagePath = snapshot.data![index];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Draggable<String>(
                           data: imagePath,
                           feedback: Material(
                             elevation: 4.0,
-                            child: Image.file(
-                              File(imagePath),
-                              width: 100,
-                              fit: BoxFit.cover,
-                            ),
+                            child: Image.file(File(imagePath), width: 100, height: 100),
                           ),
-                          childWhenDragging: Container(
-                            width: 100,
-                            color: Colors.grey.shade200,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Image.file(
-                              File(imagePath),
-                              fit: BoxFit.cover,
-                              width: 100,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
-                  return const SizedBox(
-                    height: 100,
-                    child: Center(child: CircularProgressIndicator()),
+                          childWhenDragging: Container(),
+                          onDraggableCanceled: (velocity, offset) {
+                            setState(() {
+                              bulletinBoardImagePaths.add(imagePath);
+                              bulletinBoardImages.add(
+                                PositionedImage(imagePath: imagePath, position: offset),
+                              );
+                            });
+                          },
+                          child: Image.file(File(imagePath), width: 100, height: 100),
+                        ),
+                      );
+                    },
                   );
                 }
-                // Default return statement to ensure a widget is always returned
-                return const SizedBox(
-                  height: 100,
-                  child: Center(child: Text('Unable to load images')),
-                );
               },
             ),
           ),
@@ -140,3 +100,4 @@ class _GalleryPageState extends State<GalleryPage> {
     );
   }
 }
+
