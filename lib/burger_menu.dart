@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'providers/camera_provider.dart';
 
 class BurgerMenu extends StatelessWidget {
-  const BurgerMenu({Key? key}) : super(key: key);
+  const BurgerMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
