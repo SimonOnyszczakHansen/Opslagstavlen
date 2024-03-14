@@ -40,6 +40,9 @@ dependencies:
   camera: ^0.10.5+9
   provider: ^6.1.2
   http: ^1.2.1
+  mockito: ^5.4.4
+  build_runner: ^2.4.8
+  dev: ^1.0.0
 
 dev_dependencies:
   flutter_test:

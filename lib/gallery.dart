@@ -55,6 +55,7 @@ class GalleryPageState extends State<GalleryPage> {
           ),
           Container(
             height: 100,
+            color: Colors.pink,
             child: FutureBuilder<List<String>>(
               future: fetchImagePaths(),
               builder: (context, snapshot) {
