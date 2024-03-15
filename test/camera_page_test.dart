@@ -3,25 +3,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:camera/camera.dart';
 import 'package:provider/provider.dart';
 import '../lib/camera.dart';
+import 'package:mockito/mockito.dart';
 
 void main() {
   group('CameraPage', () {
-    late CameraController controller;
+    CameraController? controller;
 
     setUp(() async {
       final cameras = await availableCameras();
       controller = CameraController(cameras.first, ResolutionPreset.medium);
-      await controller.initialize();
+      await controller!.initialize();
     });
 
     tearDown(() {
-      controller.dispose();
+      controller?.dispose();
     });
 
     testWidgets('displays the camera preview and a capture button', (WidgetTester tester) async {
       await tester.pumpWidget(
         Provider<CameraController>(
-          create: (_) => controller,
+          create: (_) => controller!,
           child: const MaterialApp(
             home: CameraPage(),
           ),
