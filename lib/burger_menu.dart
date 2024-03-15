@@ -5,6 +5,7 @@ import 'providers/camera_provider.dart';
 
 class BurgerMenu extends StatelessWidget {
   const BurgerMenu({super.key});
+  final Key cameraButton = const Key('cameraButton');
 
   @override
   Widget build(BuildContext context) {

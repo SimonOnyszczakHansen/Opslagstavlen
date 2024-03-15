@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/burger_menu.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +7,7 @@ import 'package:camera/camera.dart';
 import 'providers/image_provider.dart'; 
 import 'providers/camera_provider.dart'; 
 import 'package:http/http.dart' as http; 
+import 'package:flutter/foundation.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -19,7 +22,7 @@ class CameraPageState extends State<CameraPage> {
   @override
   void initState() {
     super.initState();
-    _initializeCamera(); // Initialize the camera when the widget is created
+    _initializeCamera();
   }
 
   Future<void> _initializeCamera() async {
@@ -41,6 +44,10 @@ class CameraPageState extends State<CameraPage> {
     _controller.dispose(); // Dispose the camera controller when the widget is disposed
     super.dispose();
   }
+  Future<String> encodeImageToBase64(String imagePath) async {
+  final bytes = File(imagePath).readAsBytesSync();
+  return base64Encode(bytes);
+}
 
 Future<void> _takePicture() async {
   try {
@@ -55,16 +62,23 @@ Future<void> _takePicture() async {
 }
 
   Future<void> _uploadImage(XFile image) async {
-  var uri = Uri.parse('http://10.0.2.2:3000/api/upload'); // Define the URI for the upload endpoint
-  var request = http.MultipartRequest('POST', uri) // Create a POST request
-    ..files.add(await http.MultipartFile.fromPath('image', image.path)); // Add image as multipart file
+  try {
+    // Use compute to run encodeImageToBase64 in a background isolate
+    final base64Image = await compute(encodeImageToBase64, image.path);
 
-  var response = await request.send(); // Send the request
+    var uri = Uri.parse('http://10.0.2.2:3000/api/upload');
+    var request = http.MultipartRequest('POST', uri)
+      ..fields['image'] = base64Image;
 
-  if (response.statusCode == 200) {
-    print('Image uploaded successfully'); // Print success message if upload succeeds
-  } else {
-    print('Failed to upload image'); // Print failure message if upload fails
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      print('Image uploaded successfully');
+    } else {
+      print('Failed to upload image');
+    }
+  } catch (e) {
+    print(e.toString());
   }
 }
 
