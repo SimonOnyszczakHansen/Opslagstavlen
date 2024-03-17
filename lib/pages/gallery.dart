@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/burger_menu.dart'; // Import the BurgerMenu widget
+import 'package:flutter_application_2/widgets/burger_menu.dart'; // Import the BurgerMenu widget
 import 'dart:io';
-import 'providers/image_provider.dart';
+import '../providers/image_provider.dart';
 import 'package:provider/provider.dart';
-import 'models/positioned_image_model.dart'; // Import the PositionedImage model
+import '../models/positioned_image_model.dart'; // Import the PositionedImage model
 
 class GalleryPage extends StatefulWidget {
   const GalleryPage({Key? key}) : super(key: key);
