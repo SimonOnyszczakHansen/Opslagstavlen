@@ -3,12 +3,14 @@ const express = require('express'); // Framework for building web applications
 const multer = require('multer'); // Middleware for handling multipart/form-data, used for uploading files
 const path = require('path'); // Provides utilities for working with file and directory paths
 const fs = require('fs'); // File System module to interact with the file system
+const jwt = require('jsonwebtoken');
 
 const app = express(); // Create an Express application
 const port = 3000; // Port number for the server to listen on
 
 // Serve static files from the "public" directory
 app.use(express.static('public'));
+app.use(express.json);
 
 // Set up storage engine for Multer
 const storage = multer.diskStorage({

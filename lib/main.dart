@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_application_2/widgets/burger_menu.dart';
 import 'package:provider/provider.dart';
 import 'providers/camera_provider.dart';
@@ -8,7 +10,14 @@ import 'package:go_router/go_router.dart';
 import 'pages/camera.dart';
 import 'pages/gallery.dart';
 
-void main() => runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+   options: DefaultFirebaseOptions.currentPlatform,
+ );
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  runApp(const MyApp());
+}
 
 // Initialize GoRouter with routes
 final GoRouter _router = GoRouter(routes: <RouteBase>[

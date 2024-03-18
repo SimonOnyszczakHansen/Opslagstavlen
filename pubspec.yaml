@@ -44,6 +44,8 @@ dependencies:
   mockito: ^5.4.4
   build_runner: ^2.4.8
   dev: ^1.0.0
+  firebase_core: ^2.27.1
+  firebase_messaging: ^14.7.20
 
 dev_dependencies:
   flutter_test:

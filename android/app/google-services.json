@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "561031004410",
+    "project_id": "opslagstavlen-3dcce",
+    "storage_bucket": "opslagstavlen-3dcce.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561031004410:android:2579ec0dd36df079d1c943",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBA1fGl6M-d0WfkbDEbM-bssrZ3d2zM5J0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
