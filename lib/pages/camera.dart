@@ -2,12 +2,14 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/widgets/burger_menu.dart'; // Update with your actual import path
+import 'package:flutter_application_2/widgets/burger_menu.dart'; // Update with your actual import path
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart'; 
 import '../providers/image_provider.dart'; // Update with your actual import path
 import '../providers/camera_provider.dart'; // Update with your actual import path
 import 'package:http/http.dart' as http; 
 import 'package:flutter/foundation.dart';
+import '../repositories/camera_repository.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({Key? key}) : super(key: key);
@@ -20,23 +22,25 @@ class CameraPageState extends State<CameraPage> {
   CameraController? controller;
 
   @override
-  void initState() {
-    super.initState();
-    _initializeCamera();
-  }
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await _initializeCamera();
+  });
+}
 
-  Future<void> _initializeCamera() async {
-    final cameraProvider = Provider.of<CameraProvider>(context, listen: false);
-    await cameraProvider.initializeCameras();
-    if (cameraProvider.controller != null) {
-      setState(() {
-        controller = cameraProvider.controller;
-      });
-      controller?.addListener(() {
-        if (mounted) setState(() {});
-      });
-    }
+Future<void> _initializeCamera() async {
+  // Ensure this method is only called once the widget is part of the tree
+  // and has a context
+  final cameraRepository = Provider.of<CameraRepository>(context, listen: false);
+  await cameraRepository.initializeCameras();
+  if (cameraRepository.controller != null) {
+    setState(() {
+      controller = cameraRepository.controller;
+    });
   }
+}
+
 
   Future<String> encodeImageToBase64(String imagePath) async {
     final bytes = await File(imagePath).readAsBytes();

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_2/repositories/camera_repository.dart';
+import 'package:flutter_application_2/repositories/image_repository.dart';
 import 'package:flutter_application_2/widgets/burger_menu.dart';
 import 'package:provider/provider.dart';
 import 'providers/camera_provider.dart';
@@ -39,7 +41,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CameraProvider()), // Provides CameraProvider to the app
-        ChangeNotifierProvider(create: (_) => ImageStorageProvider()) // Provides ImageStorageProvider to the app
+        ChangeNotifierProvider(create: (_) => ImageStorageProvider()), // Provides ImageStorageProvider to the app
+        Provider(create: (_) => CameraRepository()),
+        Provider(create: (_) => ImageRepository())
       ],
       child: MaterialApp.router(
         title: 'Home Page', // Set the title for the application
