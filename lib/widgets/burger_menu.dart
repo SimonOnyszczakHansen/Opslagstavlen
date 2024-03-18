@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'providers/camera_provider.dart';
+import '../providers/camera_provider.dart';
 
 class BurgerMenu extends StatelessWidget {
   const BurgerMenu({super.key});

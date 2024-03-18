@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/burger_menu.dart';
+import 'package:flutter_application_2/widgets/burger_menu.dart';
 import 'package:provider/provider.dart';
 import 'providers/camera_provider.dart';
 import 'providers/image_provider.dart';
 import 'package:go_router/go_router.dart';
-import 'camera.dart';
-import 'gallery.dart';
+import 'pages/camera.dart';
+import 'pages/gallery.dart';
 
 void main() => runApp(const MyApp());
 

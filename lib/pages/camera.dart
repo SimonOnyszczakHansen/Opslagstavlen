@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/burger_menu.dart'; // Update with your actual import path
+import 'package:flutter_application_2/widgets/burger_menu.dart'; // Update with your actual import path
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart'; 
-import 'providers/image_provider.dart'; // Update with your actual import path
-import 'providers/camera_provider.dart'; // Update with your actual import path
+import '../providers/image_provider.dart'; // Update with your actual import path
+import '../providers/camera_provider.dart'; // Update with your actual import path
 import 'package:http/http.dart' as http; 
 import 'package:flutter/foundation.dart';
 
