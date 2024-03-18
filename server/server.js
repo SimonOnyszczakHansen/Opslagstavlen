@@ -1,66 +1,89 @@
-// Required Node.js modules
-const express = require('express'); // Framework for building web applications
-const multer = require('multer'); // Middleware for handling multipart/form-data, used for uploading files
-const path = require('path'); // Provides utilities for working with file and directory paths
-const fs = require('fs'); // File System module to interact with the file system
+const express = require('express');
+const multer = require('multer');
+const path = require('path'); 
+const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 
 const app = express(); // Create an Express application
-const port = 3000; // Port number for the server to listen on
+const port = 3000; // Define the port number for the server to listen on
 
-// Serve static files from the "public" directory
-app.use(express.static('public'));
-app.use(express.json);
+// Middlewares
+app.use(cors()); // Enable CORS for all domains
+app.use(express.static('public')); // Serve static files from the 'public' directory
+app.use(express.json()); // Parse JSON bodies in incoming requests
 
-// Set up storage engine for Multer
+// Configure multer for file uploads
 const storage = multer.diskStorage({
-  destination: './public/uploads/', // Set the destination for storing uploaded files
-  filename: function(req, file, cb) {
-    // Set the filename for the uploaded file
+  destination: './public/uploads/', // Destination directory for uploaded files
+  filename: function (req, file, cb) {
+    // Generate a unique filename for the uploaded file
     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   }
 });
 
-// Initialize upload configuration using Multer
+// Initialize multer with the storage configuration and file size limit
 const upload = multer({
-  storage: storage, // Use the storage engine defined above
-  limits: { fileSize: 1000000 }, // Set the file size limit to 1MB
-}).single('image'); // Specify that the field name in the form should be 'image', and only one file at a time
+  storage: storage,
+  limits: { fileSize: 1000000 }, // 1MB file size limit
+}).single('image'); // Accept a single file with the field name 'image'
 
-// Endpoint for handling file uploads
+// JWT secret for signing tokens, use environment variable or a fallback string
+const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
+
+// POST endpoint for user login
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+  // Example credentials check (in a real application, verify against a database)
+  if (username === 'user1' && password === '1234') {
+    const user = { username: 'user1', mail: 'simon@mail.com' }
+    // Sign a JWT for the authenticated user
+    jwt.sign({ user }, jwtSecret, { expiresIn: '1h' }, (err, token) => {
+      if (err) {
+        res.sendStatus(500); // Internal server error
+      } else {
+        res.json({ token }); // Send the JWT to the client
+      }
+    });
+  } else {
+    res.status(401).json({ message: 'invalid credentials' }); // Unauthorized access
+  }
+});
+
+// POST endpoint for file uploads
 app.post('/api/upload', (req, res) => {
   upload(req, res, (err) => {
-    if(err) {
-      // If an error occurred during uploading, send an error message
+    if (err) {
+      // Handle file upload errors
       res.send({ message: 'Error uploading file.', error: err });
     } else {
-      if(req.file == undefined) {
-        // If no file was selected for upload, send a message indicating so
+      if (req.file == undefined) {
+        // No file was selected for upload
         res.send({ message: 'No file selected.' });
       } else {
-        // If the file was successfully uploaded, send a success message and the filename
+        // File was successfully uploaded
         res.send({ message: 'File uploaded.', filename: req.file.filename });
       }
     }
   });
 });
 
-// Endpoint to retrieve a list of uploaded images
+// GET endpoint to retrieve a list of uploaded images
 app.get('/api/images', (req, res) => {
-    const dir = './public/uploads/'; // Directory where uploaded images are stored
-    fs.readdir(dir, (err, files) => {
-      if (err) {
-        // If an error occurred reading the directory, send a server error
-        console.error(err);
-        res.status(500).send('Server error');
-      } else {
-        // Filter the list of files to only include images and prepend the path to each file
-        const imageFiles = files.filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file))
-                               .map(file => `${req.protocol}://${req.get('host')}/uploads/${file}`);
-        res.send(imageFiles); // Send the list of image files
-      }
-    });
+  const dir = './public/uploads/'; // Directory where uploaded images are stored
+  fs.readdir(dir, (err, files) => {
+    if (err) {
+      // Handle errors reading the directory
+      console.error(err);
+      res.status(500).send('Server error');
+    } else {
+      // Filter and send the list of image files
+      const imageFiles = files.filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file))
+        .map(file => `${req.protocol}://${req.get('host')}/uploads/${file}`);
+      res.send(imageFiles);
+    }
   });
+});
 
-// Start the server and listen on the specified port
+// Start the server
 app.listen(port, () => console.log(`Server listening at http://localhost:${port}`));
