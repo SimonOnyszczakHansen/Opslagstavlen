@@ -16,6 +16,7 @@ Future<void> main() async {
    options: DefaultFirebaseOptions.currentPlatform,
  );
   final fcmToken = await FirebaseMessaging.instance.getToken();
+  print(fcmToken);
   runApp(const MyApp());
 }
 
