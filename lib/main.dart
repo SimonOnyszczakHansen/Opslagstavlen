@@ -1,24 +1,33 @@
 import 'package:flutter/material.dart';
-import 'firebase_options.dart'; // Configuration options for Firebase
-import 'package:firebase_messaging/firebase_messaging.dart'; // Firebase Cloud Messaging for push notifications
-import 'package:firebase_core/firebase_core.dart'; // Core Firebase library necessary for initializing Firebase
-import 'package:flutter_application_2/widgets/burger_menu.dart'; // Custom widget for the navigation drawer (burger menu)
-import 'package:provider/provider.dart'; // State management package to provide and consume app-wide data
-import 'providers/camera_provider.dart'; // State management for camera functionality
-import 'providers/image_provider.dart'; // State management for handling images
-import 'package:go_router/go_router.dart'; // Modern navigation package for Flutter
-import 'screens/camera.dart'; // Screen widget for camera functionality
-import 'screens/gallery.dart'; // Screen widget for gallery view
-import 'services/authentication_service.dart'; // Service class for handling authentication
-import 'dart:convert'; // Dart's built-in library for encoding and decoding JSON
+import 'firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_2/widgets/burger_menu.dart';
+import 'package:provider/provider.dart';
+import 'providers/camera_provider.dart';
+import 'providers/image_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'screens/camera.dart'; 
+import 'screens/gallery.dart';
+import 'services/authentication_service.dart';
+import 'dart:convert';
+import 'services/foreground_notification_service.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensures that Flutter engine is initialized
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ); // Initializes Firebase with the default options
+
+  ForegroundNotificationService service = ForegroundNotificationService();
+
+  await service.requestNotificationPermission();
+
+  service.firebaseInit();
+
   final fcmToken = await FirebaseMessaging.instance.getToken(); // Retrieves the FCM token for the device
   print(fcmToken); // Prints the FCM token for debugging purposes
+  
   runApp(const MyApp()); // Runs the app
 }
 
