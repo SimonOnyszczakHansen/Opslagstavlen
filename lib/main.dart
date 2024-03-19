@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -18,17 +19,21 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ); // Initializes Firebase with the default options
-
   ForegroundNotificationService service = ForegroundNotificationService();
-
   await service.requestNotificationPermission();
-
   service.firebaseInit();
-
   final fcmToken = await FirebaseMessaging.instance.getToken(); // Retrieves the FCM token for the device
   print(fcmToken); // Prints the FCM token for debugging purposes
+  if (!kIsWeb) {
+    FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
+  }
   
   runApp(const MyApp()); // Runs the app
+}
+
+@pragma('vm:entry-point')
+Future<void> _backgroundHandler(RemoteMessage message) async {
+  debugPrint('handling in background: ${message.messageId}');
 }
 
 // Initialize GoRouter with routes for app navigation
