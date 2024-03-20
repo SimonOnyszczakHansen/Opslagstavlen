@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const path = require('path'); 
+const path = require('path');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
@@ -12,6 +12,14 @@ const port = 3000; // Define the port number for the server to listen on
 app.use(cors()); // Enable CORS for all domains
 app.use(express.static('public')); // Serve static files from the 'public' directory
 app.use(express.json()); // Parse JSON bodies in incoming requests
+
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./opslagstavlen-3dcce-firebase-adminsdk-dtr1s-d7dd023a0c.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -25,7 +33,6 @@ const storage = multer.diskStorage({
 // Initialize multer with the storage configuration and file size limit
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1000000 }, // 1MB file size limit
 }).single('image'); // Accept a single file with the field name 'image'
 
 // JWT secret for signing tokens, use environment variable or a fallback string

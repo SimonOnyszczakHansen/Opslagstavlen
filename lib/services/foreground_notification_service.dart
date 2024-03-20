@@ -23,6 +23,8 @@ class ForegroundNotificationService {
   }
 
   void firebaseInit() {
+    FirebaseMessaging.instance.subscribeToTopic('images_completed');
+
     FirebaseMessaging.onMessage.listen((message) {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification!.android;

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../widgets/burger_menu.dart'; // Update with your actual import path
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart'; 
-import '../providers/image_provider.dart'; // Update with your actual import path
+import '../providers/image_storage_provider.dart'; // Update with your actual import path
 import '../providers/camera_provider.dart'; // Update with your actual import path
 import 'package:http/http.dart' as http; 
 import 'package:flutter/foundation.dart';

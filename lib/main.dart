@@ -6,7 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_application_2/widgets/burger_menu.dart';
 import 'package:provider/provider.dart';
 import 'providers/camera_provider.dart';
-import 'providers/image_provider.dart';
+import 'providers/image_storage_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'screens/camera.dart'; 
 import 'screens/gallery.dart';
